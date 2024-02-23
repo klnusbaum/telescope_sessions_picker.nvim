@@ -17,7 +17,13 @@ local finders = require("telescope.finders")
 local pickers = require("telescope.pickers")
 local conf = require("telescope.config").values
 
-local sessions_dir = vim.fn.stdpath('data') ..'/session/' --TODO - use global var or smthign
+local sessions_dir = vim.fn.stdpath('data') .. '/session/' --TODO - use global var or smthign
+local keymaps = {
+    load_session = '<CR>',
+    new_session = '<C-n>',
+    del_session = '<Del>',
+    save_current = '<C-s>',
+}
 -- local project_actions = require("telescope._extensions.project_actions")
 
 local load_session = function(prompt_bufnr)
@@ -119,10 +125,10 @@ local sessions_picker = function(projects, opts)
     },
     sorter = conf.file_sorter({}),
     attach_mappings = function(prompt_bufnr, map)
-      map('i', '<CR>', load_session)
-      map('i', '<C-n>', new_session) -- TODO
-      map('i', '<Del>', del_session) -- TODO
-      map('i', '<C-s>', save_current) -- TODO
+            map('i', keymaps.load_session, load_session)
+            map('i', keymaps.new_session, new_session)   -- TODO
+            map('i', keymaps.del_session, del_session)   -- TODO
+            map('i', keymaps.save_current, save_current) -- TODO
       return true
     end
   }):find()
@@ -130,7 +136,17 @@ end
 
 
 M.setup = function(ext_config)
-		sessions_dir = ext_config.sessions_dir or vim.fn.stdpath('data') ..'/session/'
+    sessions_dir = ext_config.sessions_dir or vim.fn.stdpath('data') .. '/session/'
+
+    local default_keymaps = {
+        load_session = '<CR>',
+        new_session = '<C-n>',
+        del_session = '<Del>',
+        save_current = '<C-s>',
+    }
+    for f, _ in pairs(default_keymaps) do
+        keymaps[f] = ext_config.keymaps[f] or default_keymaps[f]
+    end
 end
 
 M.run_sessions_picker = function(opts)
